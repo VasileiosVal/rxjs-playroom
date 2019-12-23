@@ -1,8 +1,16 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { interval } from "rxjs";
 
-function App() {
+const App = () => {
+  useEffect(() => {
+    const first$ = interval(1000);
+    first$.subscribe(res => {
+      console.log(`first rxjs ${res}`);
+    });
+  }, []);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -21,6 +29,6 @@ function App() {
       </header>
     </div>
   );
-}
+};
 
 export default App;
