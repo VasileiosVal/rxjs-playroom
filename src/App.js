@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { interval, noop, of, concat } from "rxjs";
-import { map, tap, filter, shareReplay } from "rxjs/operators";
+import { interval, noop, of, concat, from } from "rxjs";
+import { map, tap, filter, shareReplay, concatMap } from "rxjs/operators";
 import axios from "axios";
 import { createHttpObservable } from "./utils";
 
@@ -33,10 +33,25 @@ const App = () => {
     // );
 
     // of - concat
-    const source1$ = of(1, 2, 3);
-    const source2$ = of(4, 5, 6);
-    const general$ = concat(source1$, source2$);
-    general$.subscribe(res => console.log(`emitting value ${res}`));
+    // const source1$ = of(1, 2, 3);
+    // const source2$ = of(4, 5, 6);
+    // const general$ = concat(source1$, source2$);
+    // general$.subscribe(res => console.log(`emitting value ${res}`));
+
+    const fetchPost$ = id =>
+      from(
+        axios(`https://jsonplaceholder.typicode.com/posts/${id}`).then(
+          res => res.data
+        )
+      );
+
+    const itteration$ = of(1, 2, 3, 4);
+
+    itteration$.pipe(concatMap(id => fetchPost$(id))).subscribe(
+      res => console.log(res),
+      noop,
+      () => console.log("finished")
+    );
   }, []);
 
   return (
