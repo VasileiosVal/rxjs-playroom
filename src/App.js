@@ -10,7 +10,9 @@ import {
   concatMap,
   mergeMap,
   timeout,
-  exhaustMap
+  exhaustMap,
+  debounceTime,
+  distinctUntilChanged
 } from "rxjs/operators";
 import axios from "axios";
 import { createHttpObservable } from "./utils";
@@ -86,6 +88,13 @@ const App = () => {
         noop,
         er => console.log("errorrr")
       );
+
+    fromEvent(document.getElementById("text-input"), "input")
+      .pipe(
+        map(e => e.target.value),
+        debounceTime(200)
+      )
+      .subscribe(console.log);
   }, []);
 
   return (
@@ -105,6 +114,7 @@ const App = () => {
         </a>
         <div>
           <button id="trigger">Click me</button>
+          <input id="text-input" type="text" placeholder="Type here.." />
         </div>
       </header>
     </div>
