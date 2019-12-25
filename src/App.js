@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { interval, noop, of, concat, from, merge } from "rxjs";
+import { interval, noop, of, concat, from, merge, fromEvent } from "rxjs";
 import {
   map,
   tap,
   filter,
   shareReplay,
   concatMap,
-  mergeMap
+  mergeMap,
+  timeout,
+  exhaustMap
 } from "rxjs/operators";
 import axios from "axios";
 import { createHttpObservable } from "./utils";
@@ -46,11 +48,11 @@ const App = () => {
     // general$.subscribe(res => console.log(`emitting value ${res}`));
 
     //of - merge
-    const source1$ = interval(1000);
-    const source2$ = source1$.pipe(map(num => num * 10));
+    // const source1$ = interval(1000);
+    // const source2$ = source1$.pipe(map(num => num * 10));
 
-    const merge$ = merge(source1$, source2$);
-    merge$.subscribe(console.log);
+    // const merge$ = merge(source1$, source2$);
+    // merge$.subscribe(console.log);
 
     //promise iteration is series and parallel (concatMap, mergeMap)
     const fetchPost$ = id =>
@@ -67,6 +69,23 @@ const App = () => {
       noop,
       () => console.log("finished")
     );
+
+    //no multiple streams fired when a button clicked again - exhaustMap and fromEvent
+    fromEvent(document.getElementById("trigger"), "click")
+      .pipe(
+        exhaustMap(() =>
+          from(
+            axios("http://www.google.com")
+              .then(res => res.data)
+              .catch(err => "an error occured")
+          )
+        )
+      )
+      .subscribe(
+        res => console.log(res),
+        noop,
+        er => console.log("errorrr")
+      );
   }, []);
 
   return (
@@ -84,6 +103,9 @@ const App = () => {
         >
           Learn React
         </a>
+        <div>
+          <button id="trigger">Click me</button>
+        </div>
       </header>
     </div>
   );
