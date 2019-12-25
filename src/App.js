@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { interval, noop, of, concat, from } from "rxjs";
-import { map, tap, filter, shareReplay, concatMap } from "rxjs/operators";
+import { interval, noop, of, concat, from, merge } from "rxjs";
+import {
+  map,
+  tap,
+  filter,
+  shareReplay,
+  concatMap,
+  mergeMap
+} from "rxjs/operators";
 import axios from "axios";
 import { createHttpObservable } from "./utils";
 
@@ -38,6 +45,14 @@ const App = () => {
     // const general$ = concat(source1$, source2$);
     // general$.subscribe(res => console.log(`emitting value ${res}`));
 
+    //of - merge
+    const source1$ = interval(1000);
+    const source2$ = source1$.pipe(map(num => num * 10));
+
+    const merge$ = merge(source1$, source2$);
+    merge$.subscribe(console.log);
+
+    //promise iteration is series and parallel (concatMap, mergeMap)
     const fetchPost$ = id =>
       from(
         axios(`https://jsonplaceholder.typicode.com/posts/${id}`).then(
@@ -47,7 +62,7 @@ const App = () => {
 
     const itteration$ = of(1, 2, 3, 4);
 
-    itteration$.pipe(concatMap(id => fetchPost$(id))).subscribe(
+    itteration$.pipe(mergeMap(id => fetchPost$(id))).subscribe(
       res => console.log(res),
       noop,
       () => console.log("finished")
