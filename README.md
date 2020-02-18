@@ -1,4 +1,4 @@
-## RxJS Playroom
+## RxJS Playground
 
 A branch that i created with a purpose of learning RxJS and Reactive Programming.
 
